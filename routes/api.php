@@ -6,6 +6,8 @@ use App\Http\Controllers\TeacherController;
 use App\Http\Controllers\ClassroomController;
 use App\Http\Controllers\SiblingController;
 use App\Http\Controllers\StudentController;
+use App\Http\Controllers\AdministratorController;
+use App\Http\Controllers\AuthController;
 
 /*
 |--------------------------------------------------------------------------
@@ -18,33 +20,44 @@ use App\Http\Controllers\StudentController;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
+
+// Route::post('/admin/register', [AdministratorController::class, 'register']);
+Route::post('/login', [AuthController::class, 'login']);
+
+
+
 
 Route::get('/teachers', [TeacherController::class, 'index']);
-Route::get('/teachers/{teacher}', [TeacherController::class, 'show']);
-Route::post('/teachers', [TeacherController::class, 'store']);
-Route::put('/teachers/{teacher}', [TeacherController::class, 'update']);
-Route::delete('/teachers/{teacher}', [TeacherController::class, 'destroy']);
-
+Route::get('/teachers/{id}', [TeacherController::class, 'show']);
 
 Route::get('/classrooms', [ClassroomController::class, 'index']);
-Route::get('/classrooms/{classroom}', [ClassroomController::class, 'show']);
-Route::post('/classrooms', [ClassroomController::class, 'store']);
-Route::put('/classrooms/{classroom}', [ClassroomController::class, 'update']);
-Route::delete('/classrooms/{classroom}', [ClassroomController::class, 'destroy']);
-
+Route::get('/classrooms/{id}', [ClassroomController::class, 'show']);
 
 Route::get('/siblings', [SiblingController::class, 'index']);
-Route::get('/siblings/{sibling}', [SiblingController::class, 'show']);
-Route::post('/siblings', [SiblingController::class, 'store']);
-Route::put('/siblings/{sibling}', [SiblingController::class, 'update']);
-Route::delete('/siblings/{sibling}', [SiblingController::class, 'destroy']);
-
+Route::get('/siblings/{id}', [SiblingController::class, 'show']);
 
 Route::get('/students', [StudentController::class, 'index']);
-Route::get('/students/{student}', [StudentController::class, 'show']);
-Route::post('/students', [StudentController::class, 'store']);
-Route::put('/students/{student}', [StudentController::class, 'update']);
-Route::delete('/students/{student}', [StudentController::class, 'destroy']);
+Route::get('/students/{id}', [StudentController::class, 'show']);
+
+
+
+
+Route::group(['middleware' => ['auth:sanctum']], function() {
+    Route::post('/logout', [AuthController::class, 'logout']);
+
+    Route::post('/teachers', [TeacherController::class, 'store']);
+    Route::put('/teachers/{id}', [TeacherController::class, 'update']);
+    Route::delete('/teachers/{id}', [TeacherController::class, 'destroy']);
+
+    Route::post('/classrooms', [ClassroomController::class, 'store']);
+    Route::put('/classrooms/{id}', [ClassroomController::class, 'update']);
+    Route::delete('/classrooms/{id}', [ClassroomController::class, 'destroy']);
+
+    Route::post('/siblings', [SiblingController::class, 'store']);
+    Route::put('/siblings/{id}', [SiblingController::class, 'update']);
+    Route::delete('/siblings/{id}', [SiblingController::class, 'destroy']);
+
+    Route::post('/students', [StudentController::class, 'store']);
+    Route::put('/students/{id}', [StudentController::class, 'update']);
+    Route::delete('/students/{id}', [StudentController::class, 'destroy']);
+});

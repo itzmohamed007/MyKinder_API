@@ -6,21 +6,19 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Sanctum\HasApiTokens;
 
-
-class Teacher extends Model
+class Administrator extends Model
 {
     use HasFactory, HasApiTokens;
 
+    protected $table = 'admins';
     protected $fillable = [
-        'name',
-        'email',
-        'phone',
-        'image',
-        'role',
-        'password'
+        'email', 
+        'password', 
+        'role'
     ];
 
-    protected $hidden = ['password'];
-
-    public $timestamps = true;
+    protected $hidden = [
+        'password',
+        'remember_token',
+    ];
 }

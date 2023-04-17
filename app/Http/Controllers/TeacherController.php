@@ -24,9 +24,10 @@ class TeacherController extends Controller
     {
         $valid = $request->validate([
             'name' => 'required|string|max:50',
-            'email' => 'required|string|email',
+            'email' => 'required|string|email|unique:teachers,email',
             'phone' => 'required|string|min:10|max:14',
-            'image' => 'required|image|mimes:jpeg,png,jpg|max:2048'
+            'image' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+            'role' => 'required|string|max:10'
         ]);
 
         $image = $request->file('image');
@@ -39,6 +40,8 @@ class TeacherController extends Controller
             'name' => $valid['name'],
             'email' => $valid['email'],
             'phone' => $valid['phone'],
+            'role' => $valid['role'],
+            'password' => bcrypt($valid['name']),
             'image' => $newPath,
         ]);
 
