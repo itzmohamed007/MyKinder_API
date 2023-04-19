@@ -10,7 +10,7 @@ class Administrator extends Model
 {
     use HasFactory, HasApiTokens;
 
-    protected $table = 'admins';
+    protected $table = 'admin';
     protected $fillable = [
         'email', 
         'password', 

@@ -11,13 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('classrooms', function (Blueprint $table) {
+        Schema::create('siblings', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            
-            $table->foreignId('teacher_id')
-            ->constrained('teachers')
-            ->onDelete('set null');
+            $table->string('email');
+            $table->string('password');
+            $table->string('phone');
+            $table->string('role');
             
             $table->timestamps();
         });
@@ -28,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('classrooms');
+        Schema::dropIfExists('parents');
     }
 };

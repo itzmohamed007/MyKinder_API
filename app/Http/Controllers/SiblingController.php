@@ -41,7 +41,7 @@ class SiblingController extends Controller
      */
     public function show($id)
     {
-        $parent = Sibling::find($id);
+        $parent = Sibling::with('children')->find($id);
 
         if(empty($parent)) {
             return response([

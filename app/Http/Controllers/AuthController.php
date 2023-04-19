@@ -10,6 +10,30 @@ use Illuminate\Http\Request;
 
 class AuthController extends Controller
 {
+    // public function register(Request $request)
+    // {
+    //     $fields = $request->validate([
+    //         'email' => 'required|string|unique:admin,email',
+    //         'password' => 'required|string|confirmed',
+    //         'role' => 'required|string',
+    //     ]);
+
+    //     $admin = Administrator::create([
+    //         'email' => $fields['email'],
+    //         'password' => bcrypt($fields['password']),
+    //         'role' => $fields['role'],
+    //     ]);
+
+    //     $token = $admin->createToken('myapptoken')->plainTextToken;
+
+    //     $response = [
+    //         'admin' => $admin,
+    //         'token' => $token
+    //     ];
+
+    //     return response($response, 201);
+    // }
+
     public function login(Request $request)
     {
         $fields = $request->validate([
@@ -28,7 +52,7 @@ class AuthController extends Controller
             case 'teacher':
                 $user = Teacher::where('email', $fields['email'])->first();
                 break;
-            case 'parent':
+            case 'sibling':
                 $user = Sibling::where('email', $fields['email'])->first();
                 break;
             default:

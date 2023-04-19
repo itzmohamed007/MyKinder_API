@@ -13,7 +13,8 @@ class Classroom extends Model
 
     protected $fillable = [
         'name',
-        'teacher_id'
+        'teacher_id',
+        'activity'
     ];
 
     public function teacher() {

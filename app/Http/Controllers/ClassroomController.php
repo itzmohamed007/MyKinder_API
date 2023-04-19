@@ -38,7 +38,7 @@ class ClassroomController extends Controller
      */
     public function show($id)
     {
-        $classroom = Classroom::find($id);
+        $classroom = Classroom::with('students')->find($id);
 
         if(empty($classroom)) {
             return response([
@@ -48,6 +48,7 @@ class ClassroomController extends Controller
         }
 
         return $classroom;
+        // return $classroom->with('students')->get();
     }
 
     /**

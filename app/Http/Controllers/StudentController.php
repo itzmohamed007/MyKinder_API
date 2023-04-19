@@ -13,7 +13,11 @@ class StudentController extends Controller
      */
     public function index()
     {
-        return Student::with('classroom', 'teacher', 'sibling')->get();
+        $students = Student::with('classroom', 'teacher', 'sibling')->get()->map(function ($student) {
+            $student->image_url = asset('storage/' . $student->image);
+            return $student;
+        });
+        return $students;
     }
 
     /**

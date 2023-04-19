@@ -9,55 +9,58 @@ use App\Http\Controllers\StudentController;
 use App\Http\Controllers\AdministratorController;
 use App\Http\Controllers\AuthController;
 
-/*
-|--------------------------------------------------------------------------
-| API Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "api" middleware group. Make something great!
-|
-*/
-
-
-// Route::post('/admin/register', [AdministratorController::class, 'register']);
+// Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
-
-
-
-
-Route::get('/teachers', [TeacherController::class, 'index']);
-Route::get('/teachers/{id}', [TeacherController::class, 'show']);
-
-Route::get('/classrooms', [ClassroomController::class, 'index']);
-Route::get('/classrooms/{id}', [ClassroomController::class, 'show']);
-
-Route::get('/siblings', [SiblingController::class, 'index']);
-Route::get('/siblings/{id}', [SiblingController::class, 'show']);
-
-Route::get('/students', [StudentController::class, 'index']);
-Route::get('/students/{id}', [StudentController::class, 'show']);
-
-
-
 
 Route::group(['middleware' => ['auth:sanctum']], function() {
     Route::post('/logout', [AuthController::class, 'logout']);
 
-    Route::post('/teachers', [TeacherController::class, 'store']);
-    Route::put('/teachers/{id}', [TeacherController::class, 'update']);
-    Route::delete('/teachers/{id}', [TeacherController::class, 'destroy']);
+    // Gloval Select
+    Route::get('/global', [AdministratorController::class, 'global']);
+    // Teachers Read
+    Route::get('/teachers', [TeacherController::class, 'index']);
+    Route::get('/teachers/{id}', [TeacherController::class, 'show']);
 
-    Route::post('/classrooms', [ClassroomController::class, 'store']);
-    Route::put('/classrooms/{id}', [ClassroomController::class, 'update']);
-    Route::delete('/classrooms/{id}', [ClassroomController::class, 'destroy']);
+    // Classrooms Read
+    Route::get('/classrooms', [ClassroomController::class, 'index']);
 
-    Route::post('/siblings', [SiblingController::class, 'store']);
-    Route::put('/siblings/{id}', [SiblingController::class, 'update']);
-    Route::delete('/siblings/{id}', [SiblingController::class, 'destroy']);
+    // Siblings Read
+    Route::get('/siblings', [SiblingController::class, 'index']);
 
-    Route::post('/students', [StudentController::class, 'store']);
-    Route::put('/students/{id}', [StudentController::class, 'update']);
-    Route::delete('/students/{id}', [StudentController::class, 'destroy']);
+    // Students Read
+    Route::get('/students', [StudentController::class, 'index']);
+    Route::get('/students/{id}', [StudentController::class, 'show']);
+
+
+
+
+    Route::middleware(['role:admin'])->group(function() {
+
+        Route::post('/teachers', [AdministratorController::class, 'TeacherCreate']);
+        Route::put('/teachers/{id}', [AdministratorController::class, 'TeacherUpdate']);
+        Route::delete('/teachers/{id}', [AdministratorController::class, 'TeacherDelete']);
+
+
+        Route::post('/classrooms', [AdministratorController::class, 'ClassroomCreate']);
+        Route::put('/classrooms/{id}', [AdministratorController::class, 'ClassroomUpdate']);
+        Route::delete('/classrooms/{id}', [AdministratorController::class, 'ClassroomDelete']);
+
+        Route::post('/siblings', [AdministratorController::class, 'SiblingCreate']);
+        Route::put('/siblings/{id}', [AdministratorController::class, 'SiblingUpdate']);
+        Route::delete('/siblings/{id}', [AdministratorController::class, 'SiblingDelete']);
+
+        Route::post('/students', [AdministratorController::class, 'StudentCreate']);
+        Route::put('/students/{id}', [AdministratorController::class, 'StudentUpdate']);
+        Route::delete('/students/{id}', [AdministratorController::class, 'StudentDelete']);
+    });
+
+    Route::middleware(['role:teacher'])->group(function() {
+        // Select students from given classroom
+        Route::get('/classrooms/{id}', [ClassroomController::class, 'show']);
+    });
+
+    Route::middleware(['role:sibling'])->group(function() {
+        // Select own student
+        Route::get('/siblings/{id}', [SiblingController::class, 'show']);
+    });
 });

@@ -15,7 +15,7 @@ class Teacher extends Model
         'name',
         'email',
         'phone',
-        'image',
+        // 'image',
         'role',
         'password'
     ];

@@ -18,6 +18,14 @@ class TeacherController extends Controller
     }
 
     /**
+     * Display the specified resource.
+     */
+    public function show($id)
+    {
+        return Teacher::find($id);
+    }
+
+    /**
      * Store a newly created resource in storage.
     */
     public function store(Request $request)
@@ -49,14 +57,6 @@ class TeacherController extends Controller
             'status' => 201,
             'message' => 'Teacher Account Created Successfully'
         ]);
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show($id)
-    {
-        return Teacher::find($id);
     }
 
     /**
