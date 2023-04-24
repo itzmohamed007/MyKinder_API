@@ -3,64 +3,29 @@
 namespace App\Http\Controllers;
 
 use App\Models\Student;
+use App\Models\Sibling;
+use App\Models\Classroom;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
 class StudentController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        $students = Student::with('classroom', 'teacher', 'sibling')->get()->map(function ($student) {
-            $student->image_url = asset('storage/' . $student->image);
+        $students = Student::with('classroom.teacher', 'sibling')->get()->map(function ($student) {
+            $student->image_url = asset('storage/'.$student->image);
             return $student;
         });
+
         return $students;
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        $valid = $request->validate([
-            'name' => 'required|string|max:30',
-            'age' => 'required|integer',
-            'image' => 'required|image|mimes:jpeg,png,jpg|max:2048',
-            'classroom_id' => 'required',
-            'teacher_id' => 'required',
-            'sibling_id' => 'required',
-        ]);
-
-        $image = $request->file('image');
-        $tempPath = $image->store('temp', 'public');
-        
-        $newPath = 'storage/app/images/' . $image->getClientOriginalName();
-        Storage::disk('local')->move($tempPath, $newPath);  
-
-        Student::create([
-            'name' => $valid['name'],
-            'age' => $valid['age'],
-            'sibling_id' => $valid['sibling_id'],
-            'teacher_id' => $valid['teacher_id'],
-            'classroom_id' => $valid['classroom_id'],
-            'image' => $newPath,
-        ]);
-
-        return response([
-            'status' => 201,
-            'message' => 'Student Added Successfully'
-        ]);
-    }
-
-    /**
-     * Display the specified resource.
-     */
     public function show($id)
     {
-        $student = Student::find($id);
+        $student = Student::with('sibling', 'classroom')->find($id);
+        $siblings = Sibling::all();
+        $classrooms = Classroom::all();
 
         if(empty($student)) {
             return response([
@@ -69,61 +34,89 @@ class StudentController extends Controller
             ]);
         }
 
-        return $student;
+        $student->image_url = asset('storage/'.$student->image);
+
+        return response([
+            'student' => $student,
+            'classrooms' => $classrooms,
+            'siblings' => $siblings
+        ]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, $id)
+    public function teacherStudents() {
+        $students = Student::where('teacher_id', request()->user()->id)->get();
+        return $students;
+    }
+
+    public function store(Request $request)
     {
-        $student = Student::find($id);
-
-        if(empty($student)) {
-            return response([
-                'status' => '401',
-                'message' => 'Student Not Found'
-            ]);
-        }
-
         $valid = $request->validate([
             'name' => 'required|string|max:30',
             'age' => 'required|integer',
-            'image' => 'required|image|mimes:jpeg,png,jpg|max:2048',
-            'teacher_id' => 'required',
-            'sibling_id' => 'required',
-            'classroom_id' => 'required',
+            'image' => 'required|image|mimes:jpeg,png,jpg',
+            'classroom_id' => 'required|integer',
+            'sibling_id' => 'required|integer',
         ]);
 
-        $currentImagePath = $student->image;
-        $image = $request->file('image');
-        $tempPath = $image->store('temp', 'public');
-        
-        $newPath = 'storage/app/images/' . $image->getClientOriginalName();
-        Storage::disk('local')->move($tempPath, $newPath);
+        $image_path = $request->file('image')->store('image', 'public');
+
+        Student::create([
+            'name' => $valid['name'],
+            'age' => $valid['age'],
+            'sibling_id' => $valid['sibling_id'],
+            'classroom_id' => $valid['classroom_id'],
+            'image' => $image_path
+        ]);
+
+        return response([
+            'status' => 201,
+            'message' => 'Student Added Successfully'
+        ]);
+    }
+
+    public function update(Request $request, $id)
+    {
+        $student = Student::find($id);
+    
+        if (!$student) {
+            return response([
+                'status' => 401,
+                'message' => 'Student Not Found'
+            ]);
+        }
+    
+        $valid = $request->validate([
+            'name' => 'required|string|max:30',
+            'age' => 'required|integer',
+            'sibling_id' => 'required|integer',
+            'classroom_id' => 'required|integer',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg'
+        ]);
+    
+        $image_path = $student->image;
+    
+        if ($request->hasFile('image')) {
+            $image_path = $request->file('image')->store('image', 'public');
+    
+            if ($image_path) {
+                Storage::delete($student->image);
+            }
+        }
 
         $student->update([
             'name' => $valid['name'],
             'age' => $valid['age'],
-            'teacher_id' => $valid['teacher_id'],
             'sibling_id' => $valid['sibling_id'],
             'classroom_id' => $valid['classroom_id'],
-            'image' => $newPath,
+            'image' => $image_path,
         ]);
-
-        if(Storage::disk()->exists($currentImagePath)) {
-            Storage::disk()->delete($currentImagePath);
-        }
-
+    
         return $student;
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy($id)
+    public function delete($id)
     {
-        if(Student::destroy($id)) {
+        if (Student::destroy($id)) {
             return response([
                 'status' => '200',
                 'message' => 'Student Deleted Successfully'
@@ -134,5 +127,41 @@ class StudentController extends Controller
                 'message' => 'Student Not Found'
             ]);
         }
+    }
+
+    public function creationData() 
+    {
+        $siblings = Sibling::all();
+        $classrooms = Classroom::all();
+
+        return response([
+            'status' => 200,
+            'parents' => $siblings,
+            'classrooms' => $classrooms
+        ]);
+    }
+
+    public function storeStatus(Request $request, $id) {
+        $student = Student::find($id);
+
+        if(!$student) {
+            return response([
+                'status' => 404,
+                'message' => 'Student Not Found'
+            ]);
+        }
+
+        $validator = $request->validate([
+            'status' => 'Required|string'
+        ]);
+
+        $student->update([
+            'status' => $validator['status']
+        ]);
+
+        return response([
+            'status' => 201,
+            'message' => 'Status Added Successfully'
+        ]);
     }
 }

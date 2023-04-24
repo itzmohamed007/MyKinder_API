@@ -16,15 +16,11 @@ return new class extends Migration
             $table->string('name');
             $table->string('age');
             $table->string('image');
+            $table->longText('status')->nullable();
             
             $table->foreignId('classroom_id')
             ->nullable()
             ->constrained('classrooms')
-            ->onDelete('set null');
-            
-            $table->foreignId('teacher_id')
-            ->nullable()
-            ->constrained('teachers')
             ->onDelete('set null');
             
             $table->foreignId('sibling_id')

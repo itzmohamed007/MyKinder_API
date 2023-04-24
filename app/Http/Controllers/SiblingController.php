@@ -8,37 +8,11 @@ use Illuminate\Http\Request;
 
 class SiblingController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
         return Sibling::with('children')->get();
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        $valid = $request->validate([
-
-            'name' => 'required|string|max:50',
-            'email' => 'required|string|email',
-            'phone' => 'required|string|min:10|max:14'
-        ]);
-
-        Sibling::create($valid);
-
-        return response([
-            'status' => '201',
-            'message' => 'Parent Account Created Successfully'
-        ]);
-    }
-
-    /**
-     * Display the specified resource.
-     */
     public function show($id)
     {
         $parent = Sibling::with('children')->find($id);
@@ -53,40 +27,60 @@ class SiblingController extends Controller
         return $parent;
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
+    public function store(Request $request)
+    {
+        $valid = $request->validate([
+            'name' => 'required|string|max:50',
+            'email' => 'required|string|email|unique:siblings,email',
+            'phone' => 'required|min:10|max:14'
+        ]);
+
+        Sibling::create([
+            'name' => $valid['name'],
+            'email' => $valid['email'],
+            'phone' => $valid['phone'],
+            'role' => 'sibling',
+            'password' => bcrypt('default')
+        ]);
+
+        return response([
+            'status' => '201',
+            'message' => 'Parent Account Created Successfully'
+        ]);
+    }
+
     public function update(Request $request, $id)
     {
-        $parent = Sibling::find($id);
+        $sibling = sibling::find($id);
 
-        if(empty($parent)) {
+        if (empty($sibling)) {
             return response([
                 'status' => '404',
-                'message' => 'Parent Account Not Found'
+                'message' => 'sibling Not Found'
             ]);
         }
 
         $valid = $request->validate([
             'name' => 'required|string|max:50',
-            'email' => 'required|string|email',
-            'phone' => 'required|string|min:10|max:14'
+            'email' => 'required|string|email|unique:siblings,email',
+            'phone' => 'required|min:10|max:14'
         ]);
-        
-        $parent->update($valid);
+
+        $sibling->update([
+            'name' => $valid['name'],
+            'email' => $valid['email'],
+            'phone' => $valid['phone']
+        ]);
 
         return response([
-            'status' => '200',
-            'message' => 'Parent Account Updated Successfully'
+            'status' => '201',
+            'message' => 'Sibling Account Created Successfully'
         ]);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy($id)
+    public function delete($id)
     {
-        if(Sibling::destroy($id)) {
+        if (Sibling::destroy($id)) {
             return response([
                 'status' => '200',
                 'message' => 'Parent Account Deleted Successfully'

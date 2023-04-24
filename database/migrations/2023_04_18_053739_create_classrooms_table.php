@@ -14,13 +14,12 @@ return new class extends Migration
         Schema::create('classrooms', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('activity')->nullable();
 
-            // $table->foreignId('teacher_id')
-            //     ->constrained('teachers')
-            //     ->onDelete('set null');
-            $table->unsignedBigInteger('teacher_id');
-            $table->foreign("teacher_id")->on("teachers")->references("id")->onDelete('cascade');
+            $table->unsignedBigInteger('teacher_id')->nullable();
+            $table->foreign("teacher_id")
+            ->on("teachers")
+            ->references("id")
+            ->onDelete('set null');
 
             $table->timestamps();
         });

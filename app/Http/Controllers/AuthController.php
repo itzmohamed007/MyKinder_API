@@ -10,29 +10,28 @@ use Illuminate\Http\Request;
 
 class AuthController extends Controller
 {
-    // public function register(Request $request)
-    // {
-    //     $fields = $request->validate([
-    //         'email' => 'required|string|unique:admin,email',
-    //         'password' => 'required|string|confirmed',
-    //         'role' => 'required|string',
-    //     ]);
+    public function register(Request $request)
+    {
+        $fields = $request->validate([
+            'email' => 'required|string|unique:admin,email',
+            'password' => 'required|string|confirmed',
+        ]);
 
-    //     $admin = Administrator::create([
-    //         'email' => $fields['email'],
-    //         'password' => bcrypt($fields['password']),
-    //         'role' => $fields['role'],
-    //     ]);
+        $admin = Administrator::create([
+            'email' => $fields['email'],
+            'password' => bcrypt($fields['password']),
+            'role' => 'admin'
+        ]);
 
-    //     $token = $admin->createToken('myapptoken')->plainTextToken;
+        $token = $admin->createToken('myapptoken')->plainTextToken;
 
-    //     $response = [
-    //         'admin' => $admin,
-    //         'token' => $token
-    //     ];
+        $response = [
+            'admin' => $admin,
+            'token' => $token
+        ];
 
-    //     return response($response, 201);
-    // }
+        return response($response, 201);
+    }
 
     public function login(Request $request)
     {
@@ -41,7 +40,7 @@ class AuthController extends Controller
             'password' => 'required|string',
             'role' => 'required|string'
         ]);
-    
+
         $role = $fields['role'];
         $user = null;
     
