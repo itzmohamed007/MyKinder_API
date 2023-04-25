@@ -13,18 +13,39 @@ class SiblingController extends Controller
         return Sibling::with('children')->get();
     }
 
+    // public function show($id)
+    // {
+    //     $parent = Sibling::with('children')->find($id)->map(function ($parent) {
+    //         $parent->children['image_url'] = asset('storage/'.$parent->children['image']);
+    //     });
+
+    //     if(empty($parent)) {
+    //         return response([
+    //             'status' => '404',
+    //             'message' => 'Parent Account Not Found'
+    //         ]);
+    //     }
+
+    //     return $parent;
+    // }
+
     public function show($id)
     {
-        $parent = Sibling::with('children')->find($id);
+        $sibling = Sibling::with('children')->find($id);
 
-        if(empty($parent)) {
+        if (!$sibling) {
             return response([
-                'status' => '404',
+                'status' => 404,
                 'message' => 'Parent Account Not Found'
             ]);
         }
 
-        return $parent;
+        $sibling->children->map(function ($child) {
+            $child->image_url = asset('storage/' . $child->image);
+            return $child;
+        });
+
+        return $sibling;
     }
 
     public function store(Request $request)
