@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use App\Models\Student;
@@ -11,6 +10,7 @@ use Illuminate\Support\Facades\Storage;
 
 class StudentController extends Controller
 {
+    
     public function index()
     {
         $students = Student::with('classroom.teacher', 'sibling')->get()->map(function ($student) {

@@ -27,7 +27,7 @@ class ClassroomController extends Controller
                 'message' => 'Classroom Not Found'
             ]);
         }
-
+        
         $availableTeachers->prepend($classroom->teacher);
 
         return response([

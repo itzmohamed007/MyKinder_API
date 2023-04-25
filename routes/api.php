@@ -31,7 +31,6 @@ Route::group(['middleware' => ['auth:sanctum']], function() {
         Route::post('/teachers', [TeacherController::class, 'store']);
         Route::put('/teachers/{id}', [TeacherController::class, 'update']);
         Route::delete('/teachers/{id}', [TeacherController::class, 'delete']);
-        
 
         Route::get('/classrooms/{id}', [ClassroomController::class, 'show']);
         Route::post('/classrooms', [ClassroomController::class, 'store']);
@@ -58,6 +57,6 @@ Route::group(['middleware' => ['auth:sanctum']], function() {
 
     Route::middleware(['role:sibling'])->group(function() {
         // Select own student
-        // Route::get('/siblings/{id}', [SiblingController::class, 'show']);
+        Route::get('/siblings/{id}', [SiblingController::class, 'show']);
     });
 });
