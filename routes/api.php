@@ -56,7 +56,6 @@ Route::group(['middleware' => ['auth:sanctum']], function() {
     });
 
     Route::middleware(['role:sibling'])->group(function() {
-        // Select own student
         Route::get('/siblings/{id}', [SiblingController::class, 'show']);
     });
 });
